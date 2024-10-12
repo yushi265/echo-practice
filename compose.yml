@@ -1,0 +1,34 @@
+services:
+  # Go Echo アプリケーション
+  app:
+    build:
+      context: ./app
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./app:/app
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=pass
+      - DB_NAME=echo
+    command: air
+
+  # PostgreSQL コンテナ
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: echo
+    volumes:
+      - ./app/postgres-data:/var/lib/postgresql/data
+      - ./app/DDL:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres-data:
